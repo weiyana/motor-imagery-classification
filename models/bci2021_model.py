@@ -43,7 +43,9 @@ class BCI2021(nn.Module):
                     nn.init.normal_(m.bias.data, std=0.1)
 
     def forward(self, X):
+        
         b, n_seg, n_band, e, t = X.size()
+        X=X.type(torch.cuda.FloatTensor)
 
         # CNN
         cnn_output = []
@@ -51,16 +53,20 @@ class BCI2021(nn.Module):
             X_band = X[:, :, band, ...]
             X_band = X_band.view(-1, 1, *list(X_band.shape[2:]))
             cnn_output.append(self.cnn[band](X_band))
-
+        
         # Sub-band attention
         out = torch.cat(cnn_output, dim=1)
         if n_band != 1:
             out, _ = self.sub_band_att(out)
+        
 
         # Attention-based Bi-LSTM
-        out = out.view([b, n_seg, -1]).squeeze()
+        out = out.view([b, n_seg, -1])#.squeeze()
         out, _ = self.lstm(out)
-        out, _ = self.segment_att(out)
+        if n_seg!=1:
+            out, _ = self.segment_att(out)
+        else:
+            out=out.squeeze()
 
         # FC
         out = self.fc(out)
@@ -107,6 +113,7 @@ class Attention(nn.Module):
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
+       
         out = self.layers(x)
         score = out
         out = out * x  # element-wise product

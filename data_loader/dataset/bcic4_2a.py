@@ -16,6 +16,7 @@ class BCIC4_2A(Dataset):
     def __init__(self, options, phase):
         self.options = options
         self.load_data(phase)
+
         self.X, self.y = Preprocessor.label_selection(self.X, self.y, options.labels)
         self.segmentation()
         self.torch_form()

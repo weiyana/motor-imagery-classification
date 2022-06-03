@@ -14,7 +14,6 @@ class Trainer(BaseTrainer):
         history_mini_batch = defaultdict(list)
         # Train
         self.model.train()
-
         for i, data in enumerate(self.data.train_loader):
             # Update model per mini-batch
             inputs, labels = data[0].to(self.model.device), data[1].to(self.model.device)

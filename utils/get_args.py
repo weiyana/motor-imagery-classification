@@ -33,6 +33,7 @@ class Args:
         parser.add_argument('--model', help='model name')
 
         # Dataset
+        parser.add_argument('--dataset', type=str, default="BCIC4_2A")
         parser.add_argument('--subject', type=int, default=1)
         parser.add_argument('--save_dir')
         parser.add_argument('--band', type=band_list, help="Range of bandpass filtering")
@@ -90,7 +91,7 @@ class Args:
             self.args.target_subject = [self.args.subject]
         # All subject
         else:
-            self.args.target_subject = list(range(1, 10))
+            self.args.target_subject = list(range(1, 16))
 
     def preprocess(self):
         if self.args.mode == 'train':
@@ -111,7 +112,7 @@ class Args:
         make_dir(self.args.save_path)
 
     def set_model_config(self):
-        self.args.cfg = AttrDict(read_yaml(f'configs/{self.args.model}_config.yaml'))
+        self.args.cfg = AttrDict(read_yaml(f'configs/{self.args.model}_{self.args.dataset}_config.yaml'))
 
     def init_args(self):
         self.args.train_acc = 0.0

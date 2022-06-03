@@ -9,7 +9,6 @@ from trainers.trainer_maker import TrainerMaker
 def main():
     args_class = Args()
     args = args_class.args
-
     for args.subject in args.target_subject:
         args_class.preprocess()
         args_class.print_info()

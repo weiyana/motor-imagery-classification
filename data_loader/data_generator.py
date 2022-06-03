@@ -2,6 +2,9 @@ from torch.utils.data import DataLoader
 
 from data_loader.dataset.bcic4_2a import BCIC4_2A
 
+from data_loader.dataset.grasp import GRASP
+
+
 
 class DataGenerator:
     def __init__(self, args):
@@ -21,7 +24,13 @@ class DataGenerator:
             print("")
 
     def __data_loader(self, args, phase):
-        return DataLoader(BCIC4_2A(args, phase),
-                          batch_size=args.batch_size,
-                          shuffle=True if phase == 'train' else False,
-                          drop_last=True if phase == 'train' else False)
+        if args.dataset=="BCIC4_2A":
+            return DataLoader(BCIC4_2A(args, phase),
+                            batch_size=args.batch_size,
+                            shuffle=True if phase == 'train' else False,
+                            drop_last=True if phase == 'train' else False)
+        else:
+            return DataLoader(GRASP(args, root='data', split=phase, fs=250),
+                            batch_size=args.batch_size,
+                            shuffle=True if phase == 'train' else False,
+                            drop_last=True if phase == 'train' else False)
