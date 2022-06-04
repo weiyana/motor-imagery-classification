@@ -18,11 +18,11 @@ cnn_params:
   p_stride: 10
 
 sub_band_att_params:
-  - 239
+  - 14
   - 64
 
 lstm_params:
-  input_size: 239
+  input_size: 14
   hidden_size: 64
   num_layers: 2
 
