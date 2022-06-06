@@ -20,7 +20,8 @@ class BaseTrainer:
         self.history = history
         self.calculator = Calculator()
 
-    def train(self):
+    def train(self,best_acc_per_subject):
+        self.best_acc_per_subject=best_acc_per_subject
         print("[Start Train]")
         self.save_options(train_phase='start')
         prev_epoch, total_epoch = self.set_epoch()

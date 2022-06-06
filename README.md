@@ -48,6 +48,10 @@ pip install torchinfo braindecode moabb
 ├── bci-2021.yaml
 ├── configs
 │   └── bci2021_config.yaml
+├── data
+│   ├── Train
+│   ├── Test
+│   ├── Valid
 ├── data_loader
 │   ├── __pycache__
 │   ├── data_generator.py
@@ -75,7 +79,7 @@ pip install torchinfo braindecode moabb
 └── utils.py
 ```
 
-## 4. Dataset
+<!-- ## 4. Dataset
 
 - Use [braindecode](https://braindecode.org)
 
@@ -98,14 +102,20 @@ pip install torchinfo braindecode moabb
 
 |Models|S01|S02|S03|S04|S05|S06|S07|S08|S09|Mean|
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-BCI-2021|97.92|71.53|97.22|84.72|72.92|74.31|99.31|84.03|97.22|86.58|
+BCI-2021|97.92|71.53|97.22|84.72|72.92|74.31|99.31|84.03|97.22|86.58| -->
 
 ## 6. Get Started
+**Data preparation**
+
+```shell
+cd motor-imagery-classification #project folder
+ln -s $data_path data #
+```
 
 **Training all subjects**
 
 ```shell
-sh runs/train_all_subject.sh
+sh runs/train_all_subject_grasp.sh
 ```
 
 **Training single subject**

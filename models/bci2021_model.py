@@ -30,6 +30,7 @@ class BCI2021(nn.Module):
         self.segment_att = Attention(segment_att_params)
 
         # FC
+        self.dropout=nn.Dropout(p=0.2)
         self.fc = nn.Linear(segment_att_params[0], n_classes)
 
         # Weight initialization
@@ -56,9 +57,11 @@ class BCI2021(nn.Module):
         
         # # Sub-band attention
         # out = torch.cat(cnn_output, dim=1)
-        # import ipdb;ipdb.set_trace()
+
+        # use one cnn
         X=X.view(-1, *list(X.shape[2:]))
         out=self.cnn[0](X)
+        
         if n_band != 1:
             out, _ = self.sub_band_att(out)
         
@@ -72,6 +75,7 @@ class BCI2021(nn.Module):
             out=out.squeeze()
 
         # FC
+        out=self.dropout(out)
         out = self.fc(out)
         return out
 

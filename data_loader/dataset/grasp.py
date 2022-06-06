@@ -27,6 +27,8 @@ class GRASP(Dataset):
         # self.torch_form()
 
     def load_data(self, root, split, subject):
+        include_rest=False
+        channels=[]#15,43
         if isinstance(subject, int):
             subject = [subject]
         # load data
@@ -41,6 +43,10 @@ class GRASP(Dataset):
             epo=data['epo'][0][0]
             # fs=epo[1].item()
             x=epo[3]
+            if channels:
+                x= x[:,channels,:]
+            if not include_rest:
+                x=x[3*self.fs+1:,...]
             y=epo[4][1]
 
             # spatial 

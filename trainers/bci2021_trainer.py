@@ -65,8 +65,18 @@ class Trainer(BaseTrainer):
             if metric.endswith('acc'):
                 n_samples = len(getattr(self.data, f"{metric.split('_')[0]}_loader").dataset.y)
                 self.history[metric].append((sum(history[metric]) / n_samples))
+                
             else:
                 self.history[metric].append(sum(history[metric]) / len(history[metric]))
+        # best acc
+        if 'best_acc_val' not in self.history.keys():
+            self.history['best_acc_val']=[0.0]
+            self.best_acc_per_subject.append(0.0)
+        if self.history['val_acc'][-1]>self.history['best_acc_val'][-1]:
+            self.history['best_acc_val'][-1]=self.history['val_acc'][-1]
+            self.best_acc_per_subject[-1]=self.history['val_acc'][-1]
+        self.history['avg_sub_acc_val']=sum(self.best_acc_per_subject)/len(self.best_acc_per_subject)
+
         if self.args.mode == 'train':
             write_json(os.path.join(self.args.save_path, "history.json"), self.history)
         else:
@@ -75,7 +85,10 @@ class Trainer(BaseTrainer):
     def print_history(self):
         print(f"S{self.args.subject:02}", end=' ')
         for metric in self.history:
-            print(f"{metric}={self.history[metric][-1]:0.4f}", end=' ')
+            if isinstance(self.history[metric],list):
+                print(f"{metric}={self.history[metric][-1]:0.4f}", end=' ')
+            else:
+                print(f"{metric}={self.history[metric]:0.4f}", end=' ')
         if self.args.mode == 'train':
             print(f"lr={self.optimizer.state_dict()['param_groups'][0]['lr']:0.8f}", end=' ')
             print(f"wd={self.optimizer.state_dict()['param_groups'][0]['weight_decay']}", end=' ')
