@@ -14,7 +14,10 @@ class ModelBuilder:
 
     def __build_model(self, args):
         if args.mode == 'train':
-            model = import_model(args.model, args.cfg)
+            if args.ensemble:
+                model=import_model('ensemble', args.cfg)
+            else:
+                model = import_model(args.model, args.cfg)
             write_pickle(os.path.join(args.save_path, "model.pk"), model)
         else:
             model = pretrained_model(args.load_path)

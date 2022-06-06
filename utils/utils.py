@@ -12,6 +12,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
+from models.ensemble_model import EnsembleModel
 
 
 def convert_time(sec):
@@ -136,8 +137,11 @@ def transpose_tensor(tensor, order):
 
 
 def import_model(model_name, config):
-    module = importlib.import_module(f'models.{model_name}_model')
-    model = getattr(module, config.name)(**config)
+    if model_name=="ensemble":
+        model=EnsembleModel(**config)
+    else:
+        module = importlib.import_module(f'models.{model_name}_model')
+        model = getattr(module, config.name)(**config)
     return model
 
 

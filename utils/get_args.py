@@ -7,6 +7,7 @@ import torch
 from utils.utils import AttrDict, make_dir, print_dict
 from utils.utils import str2list, str2list_int, band_list
 from utils.utils import read_json, read_yaml
+import time
 
 
 class Args:
@@ -31,6 +32,8 @@ class Args:
 
         # Model
         parser.add_argument('--model', help='model name')
+        parser.add_argument('--model_cfg', type=str, default='', help='model configs')
+        parser.add_argument('--ensemble', action='store_true', help='copy the model and add raw data')
 
         # Dataset
         parser.add_argument('--dataset', type=str, default="BCIC4_2A")
@@ -43,6 +46,7 @@ class Args:
         parser.add_argument('--window_size', type=int)
         parser.add_argument('--step', type=int)
         parser.add_argument('--verbose', action='store_true', help="On/Off of bandpass filtering log")
+        parser.add_argument('--seg', action='store_true', help="do segmentation")
 
         # Train
         parser.add_argument('--criterion', default='CEE', help="Please enter loss function you want to use.")
@@ -105,6 +109,7 @@ class Args:
         # Set save path
         if not hasattr(self.args, 'save_path'):
             sub_dir = len(os.listdir(f"./result/{self.args.save_dir}"))
+            sub_dir=time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
             self.args.save_path = f"./result/{self.args.save_dir}/{sub_dir}/{self.args.subject}"
         else:
             self.args.save_path = os.path.join(os.path.dirname(self.args.save_path), str(self.args.subject))
@@ -112,7 +117,10 @@ class Args:
         make_dir(self.args.save_path)
 
     def set_model_config(self):
-        self.args.cfg = AttrDict(read_yaml(f'configs/{self.args.model}_{self.args.dataset}_config.yaml'))
+        if self.args.model_cfg:
+            self.args.cfg = AttrDict(read_yaml(self.args.model_cfg))
+        else:
+            self.args.cfg = AttrDict(read_yaml(f'configs/{self.args.model}_{self.args.dataset}_config.yaml'))
 
     def init_args(self):
         self.args.train_acc = 0.0

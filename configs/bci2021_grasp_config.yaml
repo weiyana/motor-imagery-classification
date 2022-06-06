@@ -6,7 +6,7 @@ init_weight: 'default'
 n_band: 5
 
 cnn_params:
-  in_channels: 3
+  in_channels: 2
   out_channels: 40
   c_kernel_size:
     - 60
@@ -27,5 +27,30 @@ lstm_params:
   num_layers: 2
 
 segment_att_params:
+  - 128
+  - 512
+
+cnn_params2:
+  in_channels: 1
+  out_channels: 40
+  c_kernel_size:
+    - 60
+    - 45
+  c_stride: 1
+  p_kernel_size:
+    - 1
+    - 35
+  p_stride: 10
+
+sub_band_att_params2:
+  - 168
+  - 64
+
+lstm_params2:
+  input_size: 168
+  hidden_size: 64
+  num_layers: 2
+
+segment_att_params2:
   - 128
   - 512

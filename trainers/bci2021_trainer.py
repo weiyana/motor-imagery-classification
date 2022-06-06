@@ -9,6 +9,7 @@ from utils.utils import make_dir, write_json
 class Trainer(BaseTrainer):
     def __init__(self, args, model, data, criterion, optimizer=None, scheduler=None, history=None):
         super(Trainer, self).__init__(args, model, data, criterion, optimizer, scheduler, history)
+        self.ensemble=args.ensemble
 
     def train_epoch(self):
         history_mini_batch = defaultdict(list)
@@ -16,7 +17,10 @@ class Trainer(BaseTrainer):
         self.model.train()
         for i, data in enumerate(self.data.train_loader):
             # Update model per mini-batch
-            inputs, labels = data[0].to(self.model.device), data[1].to(self.model.device)
+            if self.ensemble:
+                inputs, labels = [data[0].to(self.model.device),data[1].to(self.model.device)], data[-1].to(self.model.device)
+            else:
+                inputs, labels = data[0].to(self.model.device), data[-1].to(self.model.device)
             self.optimizer.zero_grad()
             outputs = self.model(inputs)
             loss = self.criterion(outputs, labels)
@@ -34,7 +38,10 @@ class Trainer(BaseTrainer):
         with torch.no_grad():
             for i, data in enumerate(self.data.val_loader):
                 # Get output per mini-batch
-                inputs, labels = data[0].to(self.model.device), data[1].to(self.model.device)
+                if self.ensemble:
+                    inputs, labels = [data[0].to(self.model.device),data[1].to(self.model.device)], data[-1].to(self.model.device)
+                else:
+                    inputs, labels = data[0].to(self.model.device), data[-1].to(self.model.device)
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
 
@@ -72,10 +79,13 @@ class Trainer(BaseTrainer):
         if 'best_acc_val' not in self.history.keys():
             self.history['best_acc_val']=[0.0]
             self.best_acc_per_subject.append(0.0)
+            self.best_epoch.append(1)
         if self.history['val_acc'][-1]>self.history['best_acc_val'][-1]:
             self.history['best_acc_val'][-1]=self.history['val_acc'][-1]
             self.best_acc_per_subject[-1]=self.history['val_acc'][-1]
+            self.best_epoch[-1]=len(self.history['val_acc'])
         self.history['avg_sub_acc_val']=sum(self.best_acc_per_subject)/len(self.best_acc_per_subject)
+        self.history['best_epoch']=self.best_epoch[-1]
 
         if self.args.mode == 'train':
             write_json(os.path.join(self.args.save_path, "history.json"), self.history)

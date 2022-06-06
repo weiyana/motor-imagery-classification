@@ -10,6 +10,7 @@ def main():
     args_class = Args()
     args = args_class.args
     best_acc_per_subject=[]
+    best_epoch=[]
     for args.subject in args.target_subject:
         args_class.preprocess()
         args_class.print_info()
@@ -28,12 +29,13 @@ def main():
         trainer = TrainerMaker(args, model, data).trainer
 
         if args.mode == 'train':
-            trainer.train(best_acc_per_subject)
+            trainer.train(best_acc_per_subject,best_epoch)
             # record best val acc
             best_acc_per_subject=trainer.best_acc_per_subject
         else:
             trainer.test()
         print("best_acc_per_subject:",best_acc_per_subject)
+        print("best_epoch:",best_epoch)
 
 
 if __name__ == '__main__':

@@ -44,7 +44,6 @@ class BCI2021(nn.Module):
                     nn.init.normal_(m.bias.data, std=0.1)
 
     def forward(self, X):
-        # import ipdb;ipdb.set_trace()
         b, n_seg, n_band, e, t = X.size()
         X=X.type(torch.cuda.FloatTensor)
 

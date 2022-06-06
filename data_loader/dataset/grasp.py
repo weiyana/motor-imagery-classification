@@ -21,9 +21,17 @@ class GRASP(Dataset):
         self.fs=fs
         self.X=self.y=self.spatial_feat=None
         self.load_data(root, split, options.subject)
-        self.torch_form()
+        self.raw_X=None
+        if self.options.ensemble:
+            self.raw_X=self.X.clone()
         # self.X, self.y = Preprocessor.label_selection(self.X, self.y, options.labels)
-        self.segmentation()
+        # import ipdb;ipdb.set_trace()
+        self.X=self.segmentation(self.X,seg=self.options.seg)
+        self.X=self.band_pass(self.X,band=self.options.band)
+        if self.options.ensemble:
+            self.raw_X=self.segmentation(self.raw_X,seg=False)
+            self.raw_X=self.band_pass(self.raw_X,band=False)
+        self.torch_form()
         # self.torch_form()
 
     def load_data(self, root, split, subject):
@@ -66,17 +74,23 @@ class GRASP(Dataset):
         self.spatial_feat=torch.cat(all_spatial_feat)
 
 
-    def segmentation(self):
-        self.X = Preprocessor.segment_tensor(self.X, self.options.window_size, self.options.step)
+    def segmentation(self,X,seg):
+        if seg:
+            X = Preprocessor.segment_tensor(X, self.options.window_size, self.options.step)
+        else:
+            X = X.unsqueeze(1)
+        return X
 
     def torch_form(self):
         self.X = self.X.type(torch.FloatTensor)
         self.y = self.y.long()
+        if self.options.ensemble:
+            self.raw_X = self.raw_X.type(torch.FloatTensor)
     
-    def band_pass(self,X):
+    def band_pass(self,X,band):
         # bands=[(0.1,4),(5,7),(8,13),(14,30)]
         filtered_X_bands=[]
-        if self.options.band:
+        if band:
             # for lowcut,highcut in self.options.band:
             #     filtered_X_channel=[]
             #     for X_channel in X:
@@ -85,13 +99,13 @@ class GRASP(Dataset):
             #     filtered_X_channel=torch.stack(filtered_X_channel)
             #     filtered_X.append(filtered_X_channel)
             # filtered_X=torch.stack(filtered_X)
-            for lowcut,highcut in self.options.band:
-                filtered_X=butter_bandpass_filter(X, lowcut, highcut, self.fs, order=6)     
-                filtered_X_bands.append(torch.from_numpy(filtered_X))
+            for lowcut,highcut in band:
+                fX=butter_bandpass_filter(X, lowcut, highcut, self.fs, order=6)     
+                filtered_X_bands.append(torch.from_numpy(fX))
             # import ipdb;ipdb.set_trace()
-            filtered_X=torch.stack(filtered_X_bands,dim=1)
+            filtered_X=torch.stack(filtered_X_bands,dim=2)
         else:
-            filtered_X=X.unsqueeze(1)
+            filtered_X=X.unsqueeze(2)
         return filtered_X
 
     def __len__(self):
@@ -99,11 +113,17 @@ class GRASP(Dataset):
 
     def __getitem__(self, idx):
         # data filter
-        # n_seg, n_band, e, t
-        X=self.X[idx]
-        filtered_X=self.band_pass(X)
+        # bs, n_seg, n_band, e, t
+
+        # if not self.options.seg:
+        #     X.unsqueeze(0)
+        # filtered_X=self.band_pass(X)
         # filtered_X=filtered_X.unsqueeze(0)
-        return filtered_X,self.y[idx]#,self.spatial_feat[idx]
+    
+        if self.options.ensemble:
+            return self.X[idx], self.raw_X[idx], self.y[idx]#,self.spatial_feat[idx]
+        else:
+            return self.X[idx], self.y[idx]
 
 
 
