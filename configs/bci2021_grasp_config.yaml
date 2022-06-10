@@ -6,7 +6,7 @@ init_weight: 'default'
 n_band: 5
 
 cnn_params:
-  in_channels: 2
+  in_channels: 1
   out_channels: 40
   c_kernel_size:
     - 60

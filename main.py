@@ -37,6 +37,9 @@ def main():
         print("best_acc_per_subject:",best_acc_per_subject)
         print("best_epoch:",best_epoch)
 
+        if args.alldata:
+            break
+
 
 if __name__ == '__main__':
     main()

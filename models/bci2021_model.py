@@ -47,19 +47,19 @@ class BCI2021(nn.Module):
         b, n_seg, n_band, e, t = X.size()
         X=X.type(torch.cuda.FloatTensor)
 
-        # # CNN
-        # cnn_output = []
-        # for band in range(n_band):
-        #     X_band = X[:, :, band, ...]
-        #     X_band = X_band.view(-1, 1, *list(X_band.shape[2:]))
-        #     cnn_output.append(self.cnn[band](X_band))
+        # CNN
+        cnn_output = []
+        for band in range(n_band):
+            X_band = X[:, :, band, ...]
+            X_band = X_band.view(-1, 1, *list(X_band.shape[2:]))
+            cnn_output.append(self.cnn[band](X_band))
         
-        # # Sub-band attention
-        # out = torch.cat(cnn_output, dim=1)
+        # Sub-band attention
+        out = torch.cat(cnn_output, dim=1)
 
         # use one cnn
-        X=X.view(-1, *list(X.shape[2:]))
-        out=self.cnn[0](X)
+        # X=X.view(-1, *list(X.shape[2:]))
+        # out=self.cnn[0](X)
         
         if n_band != 1:
             out, _ = self.sub_band_att(out)

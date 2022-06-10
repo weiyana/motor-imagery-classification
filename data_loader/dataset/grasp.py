@@ -20,7 +20,11 @@ class GRASP(Dataset):
         self.options = options
         self.fs=fs
         self.X=self.y=self.spatial_feat=None
-        self.load_data(root, split, options.subject)
+        if options.alldata:
+            subject=[i for i in range(1,16)]
+        else:
+            subject=options.subject
+        self.load_data(root, split, subject)
         self.raw_X=None
         if self.options.ensemble:
             self.raw_X=self.X.clone()
@@ -43,6 +47,7 @@ class GRASP(Dataset):
         all_X=[]
         all_y=[]
         all_spatial_feat=[]
+        # import ipdb;ipdb.set_trace()
         for subject_id in subject:
             split_folder=split[0].upper()+split[1:]
             data_path=osp.join(root,split_folder,'sample{:02d}.mat'.format(subject_id))
