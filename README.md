@@ -102,9 +102,4 @@ ln -s $data_path data #
 sh runs/train_all_subject_grasp.sh
 ```
 
-**Training single subject**
-
-```shell
-sh runs/train_single_subject.sh
-```
 

@@ -39,6 +39,12 @@ class GRASP(Dataset):
         # self.torch_form()
 
     def load_data(self, root, split, subject):
+        # import ipdb;ipdb.set_trace()
+        if self.options.ood:
+            if split=='train':
+                subject=[2,3,4,7,9,12,13,15]
+            else:
+                subject=[1,5,6,8,10,11,14]
         include_rest=False
         channels=[]#15,43
         if isinstance(subject, int):

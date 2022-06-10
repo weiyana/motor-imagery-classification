@@ -48,6 +48,7 @@ class Args:
         parser.add_argument('--verbose', action='store_true', help="On/Off of bandpass filtering log")
         parser.add_argument('--seg', action='store_true', help="do segmentation")
         parser.add_argument('--alldata', action='store_true', help="use all data")
+        parser.add_argument('--ood', action='store_true', help="ood setting")
 
         # Train
         parser.add_argument('--criterion', default='CEE', help="Please enter loss function you want to use.")
